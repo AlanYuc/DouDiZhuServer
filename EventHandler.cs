@@ -28,9 +28,9 @@ public class EventHandler
     /// </summary>
     public static void CheckPing()
     {
-        foreach(ClientState cs in NetManager.clients.Values)
+        foreach (ClientState cs in NetManager.clients.Values)
         {
-            if(NetManager.GetTimeStamp() - cs.lastPingTime > NetManager.pingInterval * 4)
+            if (NetManager.GetTimeStamp() - cs.lastPingTime > NetManager.pingInterval * 4)
             {
                 Console.WriteLine("心跳机制：已经超时，认为断开连接");
                 NetManager.Close(cs);
