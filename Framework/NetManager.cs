@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 #nullable disable
@@ -73,6 +74,8 @@ public static class NetManager
                     //当前是客户端，需要receive接收客户端消息
                 }
             }
+
+            Timer();
         }
     }
 
@@ -151,6 +154,11 @@ public static class NetManager
     /// <param name="clientState"></param>
     public static void Close(ClientState clientState)
     {
+        //反射 调用OnDisconnect方法
+        MethodInfo methodInfo = typeof(EventHandler).GetMethod("OnDisconnect");
+        object[] obj = { clientState };
+        methodInfo.Invoke(null, obj);
+
         clientState.socket.Shutdown(SocketShutdown.Both);
         clientState.socket.Close();
         clients.Remove(clientState.socket);
@@ -245,5 +253,13 @@ public static class NetManager
             Close(clientState);
             return;
         }
+    }
+
+    public static void Timer()
+    {
+        //还是反射
+        MethodInfo methodInfo = typeof(EventHandler).GetMethod("OnTimer");
+        object[] obj = { };
+        methodInfo.Invoke(null, obj);
     }
 }
