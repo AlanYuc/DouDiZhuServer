@@ -185,7 +185,7 @@ public static class NetManager
         string protocolName = MsgBase.DecodeProtocolName(readBuff.bytes, readBuff.readIndex, out nameCount);
         if(protocolName == "")
         {
-            Debug.WriteLine("OnReceiveData Fail : 解析消息名失败");
+            Console.WriteLine("OnReceiveData Fail : 解析消息名失败");
             Close(clientState);
             return;
         }
@@ -203,6 +203,47 @@ public static class NetManager
         if (readBuff.Length > sizeof(int))
         {
             OnReceiveData(clientState);
+        }
+    }
+
+    /// <summary>
+    /// 发送数据
+    /// </summary>
+    /// <param name="clientState"></param>
+    /// <param name="msgBase"></param>
+    public static void Send(ClientState clientState,MsgBase msgBase)
+    {
+        if(clientState == null || !clientState.socket.Connected)
+        {
+            return;
+        }
+
+        //编码
+        byte[] nameBytes = MsgBase.EncodeProtocolName(msgBase);
+        byte[] bodyBytes = MsgBase.Encode(msgBase);
+
+        //在消息前加上一个int的大小，用于分包粘包的处理
+        int indexNum = sizeof(int) + nameBytes.Length + bodyBytes.Length;
+
+        int index = 0;
+        byte[] sendBytes = new byte[indexNum];
+        BitConverter.GetBytes(nameBytes.Length + bodyBytes.Length).CopyTo(sendBytes, index);
+        index += sizeof(int);
+        nameBytes.CopyTo(sendBytes, index);
+        index += nameBytes.Length;
+        bodyBytes.CopyTo(sendBytes, index);
+        index += bodyBytes.Length;
+
+        try
+        {
+            clientState.socket.Send(sendBytes, 0, sendBytes.Length, SocketFlags.None);
+            Console.WriteLine("Send Success!");
+        }
+        catch (SocketException ex)
+        {
+            Console.WriteLine("Send Fail : " + ex.Message);
+            Close(clientState);
+            return;
         }
     }
 }
