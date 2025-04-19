@@ -65,7 +65,7 @@ public static class NetManager
              * 如果超时（1 毫秒内没有 Socket 可读），sockets 会被清空（Count = 0）。
             */
             Socket.Select(sockets, null, null, 1000);
-            for(int i = 0; i < sockets.Count; i++)
+            for (int i = 0; i < sockets.Count; i++)
             {
                 Socket s = sockets[i];
                 if(s == socketServer)
@@ -76,6 +76,7 @@ public static class NetManager
                 else
                 {
                     //当前是客户端，需要receive接收客户端消息
+                    Receive(s);
                 }
             }
 
@@ -94,6 +95,7 @@ public static class NetManager
             Socket socketClient = socketServer.Accept();
             Console.WriteLine("Accept Success : " + socketClient.RemoteEndPoint);
             ClientState clientState = new ClientState();
+            clientState.lastPingTime = GetTimeStamp();
             clientState.socket = socketClient;
             clients.Add(socketClient, clientState);
         }
@@ -210,6 +212,17 @@ public static class NetManager
         readBuff.MoveBytes();
 
         //分发消息
+        MethodInfo methodInfo = typeof(MsgHandler).GetMethod(protocolName);
+        Console.WriteLine("Receive : " + protocolName);
+        if (methodInfo != null)
+        {
+            object[] obj = { clientState, msgBase };
+            methodInfo.Invoke(null, obj);
+        }
+        else
+        {
+            Console.WriteLine("OnReceiveData 调用methodInfo函数失败");
+        }
 
         //继续处理
         if (readBuff.Length > sizeof(int))
@@ -233,6 +246,7 @@ public static class NetManager
         //编码
         byte[] nameBytes = MsgBase.EncodeProtocolName(msgBase);
         byte[] bodyBytes = MsgBase.Encode(msgBase);
+        Console.WriteLine("当前发送的协议名为：" + msgBase.protocolName);
 
         //在消息前加上一个int的大小，用于分包粘包的处理
         int indexNum = sizeof(int) + nameBytes.Length + bodyBytes.Length;
