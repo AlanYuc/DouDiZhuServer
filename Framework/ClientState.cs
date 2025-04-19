@@ -16,4 +16,8 @@ public class ClientState
     /// 客户端的字节数组
     /// </summary>
     public ByteArray readBuff = new ByteArray();
+    /// <summary>
+    /// 最后一次收到Ping的时间
+    /// </summary>
+    public long lastPingTime = 0;
 }

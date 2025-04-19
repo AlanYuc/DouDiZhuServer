@@ -23,6 +23,10 @@ public static class NetManager
     /// 用于检测的List
     /// </summary>
     private static List<Socket> sockets = new List<Socket>();
+    /// <summary>
+    /// 心跳的时间间隔
+    /// </summary>
+    public static long pingInterval = 30;
 
     /// <summary>
     /// 服务端连接
@@ -261,5 +265,14 @@ public static class NetManager
         MethodInfo methodInfo = typeof(EventHandler).GetMethod("OnTimer");
         object[] obj = { };
         methodInfo.Invoke(null, obj);
+    }
+
+    /// <summary>
+    /// 获取时间戳，效果类似于Time.time
+    /// </summary>
+    public static long GetTimeStamp()
+    {
+        TimeSpan timeSpan = DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, 0);
+        return Convert.ToInt64(timeSpan.TotalSeconds);
     }
 }
