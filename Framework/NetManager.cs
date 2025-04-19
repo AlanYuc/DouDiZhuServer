@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -161,6 +162,47 @@ public static class NetManager
     /// <param name="clientState"></param>
     public static void OnReceiveData(ClientState clientState)
     {
+        ByteArray readBuff = clientState.readBuff;
+        byte[] bytes = readBuff.bytes;
 
+        if(readBuff.Length<= sizeof(int))
+        {
+            //接收的消息不完整
+            return;
+        }
+
+        //先解析第一个数字，代表整个消息的长度
+        int bodyLength = BitConverter.ToInt32(bytes, readBuff.readIndex);
+        if(readBuff.Length < sizeof(int) + bodyLength)
+        {
+            //消息没有接收完全
+            return;
+        }
+
+        //解析协议名
+        readBuff.readIndex += sizeof(int);
+        int nameCount;
+        string protocolName = MsgBase.DecodeProtocolName(readBuff.bytes, readBuff.readIndex, out nameCount);
+        if(protocolName == "")
+        {
+            Debug.WriteLine("OnReceiveData Fail : 解析消息名失败");
+            Close(clientState);
+            return;
+        }
+
+        //解析协议体
+        readBuff.readIndex += nameCount;
+        int bodycount = bodyLength - nameCount;
+        MsgBase msgBase = MsgBase.Decode(protocolName, readBuff.bytes, readBuff.readIndex, bodycount);
+        readBuff.readIndex += bodycount;
+        readBuff.MoveBytes();
+
+        //分发消息
+
+        //继续处理
+        if (readBuff.Length > sizeof(int))
+        {
+            OnReceiveData(clientState);
+        }
     }
 }
