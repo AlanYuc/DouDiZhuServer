@@ -40,6 +40,19 @@ public static class NetManager
                 sockets.Add(cs.socket);
             }
 
+            /*
+             * Socket.Select方法
+             * 常用于服务器处理多个客户端连接，避免为每个 Socket 单独开线程。
+             * 四个参数：
+             * sockets：传入一个 List<Socket>，Select 会检查这些 Socket 是否有 可读数据。
+             * null：不检查可写 Socket。
+             * null：不检查错误 Socket。
+             * 1000：超时时间为 1000 微秒（即 1 毫秒）。
+             * 执行流程：
+             * Select 会阻塞（最多 1 毫秒），等待 sockets 中的任何一个 Socket 有数据可读。
+             * 如果有 Socket 可读，sockets 列表会被修改，只保留 可读的 Socket（其他 Socket 被移除）。
+             * 如果超时（1 毫秒内没有 Socket 可读），sockets 会被清空（Count = 0）。
+            */
             Socket.Select(sockets, null, null, 1000);
             for(int i = 0; i < sockets.Count; i++)
             {
