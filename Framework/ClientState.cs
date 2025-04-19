@@ -1,0 +1,19 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.Sockets;
+using System.Text;
+using System.Threading.Tasks;
+#nullable disable
+
+public class ClientState
+{
+    /// <summary>
+    /// 客户端Socket
+    /// </summary>
+    public Socket socket;
+    /// <summary>
+    /// 客户端的字节数组
+    /// </summary>
+    public ByteArray readBuff = new ByteArray();
+}
