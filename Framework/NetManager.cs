@@ -22,6 +22,11 @@ public static class NetManager
     /// </summary>
     private static List<Socket> sockets = new List<Socket>();
 
+    /// <summary>
+    /// 服务端连接
+    /// </summary>
+    /// <param name="ip">IP地址</param>
+    /// <param name="port">端口号</param>
     public static void Connect(string ip, int port)
     {
         socketServer = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
@@ -60,6 +65,7 @@ public static class NetManager
                 if(s == socketServer)
                 {
                     //当前是服务端，需要accept接收客户端连接
+                    Accept(s);
                 }
                 else
                 {
@@ -67,5 +73,94 @@ public static class NetManager
                 }
             }
         }
+    }
+
+    /// <summary>
+    /// 接收客户端Socket
+    /// </summary>
+    /// <param name="socketServer">服务端Socket</param>
+    public static void Accept(Socket socketServer)
+    {
+        try
+        {
+            Socket socketClient = socketServer.Accept();
+            Console.WriteLine("Accept Success : " + socketClient.RemoteEndPoint);
+            ClientState clientState = new ClientState();
+            clientState.socket = socketClient;
+            clients.Add(socketClient, clientState);
+        }
+        catch (SocketException ex)
+        {
+            Console.WriteLine("Accept Fail : " + ex.Message);
+        }
+    }
+
+    /// <summary>
+    /// 接收消息
+    /// </summary>
+    /// <param name="socketClient">发信息的客户端</param>
+    public static void Receive(Socket socketClient)
+    {
+        ClientState clientState = clients[socketClient];
+        ByteArray readBuff = clientState.readBuff;
+
+        int count = 0;
+        if (readBuff.Remain <= 0)
+        {
+            readBuff.MoveBytes();
+            if(readBuff.Remain <= 0)
+            {
+                Console.WriteLine("Receive Fail : 数组长度不足");
+                Close(clientState);
+                return;
+            }
+        }
+
+        try
+        {
+            count = socketClient.Receive(readBuff.bytes, readBuff.writeIndex, readBuff.Remain, SocketFlags.None);
+            Console.WriteLine("接收了客户端:{0}的消息", socketClient.RemoteEndPoint);
+        }
+        catch (SocketException ex)
+        {
+            Console.WriteLine("Receive Fail : ", ex.Message);
+            Close(clientState);
+            return;
+        }
+
+        //接收不到消息后，就可以关闭对应的客户端连接
+        if (count <= 0)
+        {
+            Console.WriteLine("Socket Close : " + socketClient.RemoteEndPoint);
+            Close(clientState);
+            return;
+        }
+
+        //写入消息的位置继续往后移
+        readBuff.writeIndex += count;
+
+        //解码
+        OnReceiveData(clientState);
+        readBuff.MoveBytes();
+    }
+
+    /// <summary>
+    /// 关闭客户端
+    /// </summary>
+    /// <param name="clientState"></param>
+    public static void Close(ClientState clientState)
+    {
+        clientState.socket.Shutdown(SocketShutdown.Both);
+        clientState.socket.Close();
+        clients.Remove(clientState.socket);
+    }
+
+    /// <summary>
+    /// 处理消息
+    /// </summary>
+    /// <param name="clientState"></param>
+    public static void OnReceiveData(ClientState clientState)
+    {
+
     }
 }
