@@ -10,6 +10,11 @@ namespace DouDiZhuServer
     {
         public static void Main()
         {
+            //所有数据和密码都能在navicat中查看
+            if(!DbManager.Connect("Game", "127.0.0.1", 3306, "root", "123456"))
+            {
+                return;
+            }
             NetManager.Connect("127.0.0.1", 8888);
         }
     }
