@@ -17,15 +17,22 @@ namespace DouDiZhuServer
             {
                 return;
             }
-            //测试DbManager.IsAccountExist方法
-            Console.WriteLine("数据库是否存在：{0}", DbManager.IsAccountExist("123"));
+            ////测试DbManager.IsAccountExist方法
+            //Console.WriteLine("数据库是否存在：{0}", DbManager.IsAccountExist("123"));
 
-            //测试注册
-            DbManager.Register("214", "123456");
-            DbManager.Register("tyc", "123456");
+            ////测试注册
+            //DbManager.Register("214", "123456");
+            //DbManager.Register("tyc", "123456");
 
-            //测试创建玩家
+            ////测试创建玩家
             //DbManager.CreatPlayer("1234");
+
+            ////测试更新玩家数据
+            //PlayerData playerData = new PlayerData();
+            //playerData.bean = 256;
+            //DbManager.UpdatePlayerData("1234", playerData);
+            //PlayerData newPlayerDate = DbManager.GetPlayerData("1234");
+            //Console.WriteLine(newPlayerDate.bean);
 
             //测试连接
             NetManager.Connect("127.0.0.1", 8888);

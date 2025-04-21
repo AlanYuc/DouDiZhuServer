@@ -126,7 +126,7 @@ public class DbManager
         try
         {
             MySqlCommand sqlCmd = new MySqlCommand(s, mySql);
-            //用于执行 SQL 命令的一个重要方法
+            //用于执行 SQL 命令的一个重要方法,增删改等
             sqlCmd.ExecuteNonQuery();
             return true;
         }
@@ -167,6 +167,118 @@ public class DbManager
         catch (Exception e)
         {
             Console.WriteLine("DbManager.CreatPlayer 角色创建失败 : " + e.Message);
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// 检查登录密码
+    /// </summary>
+    /// <param name="id">登录id</param>
+    /// <param name="pw">登录密码</param>
+    /// <returns></returns>
+    public static bool CheckPassword(string id,string pw)
+    {
+        //防止sql注入
+        if (!IsSafeString(id))
+        {
+            Console.WriteLine("DbManager.CheckPassword : id {0} 不安全.检查密码失败.", id);
+            return false;
+        }
+        if (!IsSafeString(pw))
+        {
+            Console.WriteLine("DbManager.CheckPassword : pw {0} 不安全.检查密码失败.", pw);
+            return false;
+        }
+        if (IsAccountExist(id))
+        {
+            Console.WriteLine("DbManager.CheckPassword : id {0} 已存在.检查密码失败.", id);
+            return false;
+        }
+
+        //写入的sql语句
+        string s = string.Format("SELECT * FROM account WHERE id='{0}' AND pw='{1}';", id, pw);
+
+        try
+        {
+            MySqlCommand sqlCmd = new MySqlCommand(s, mySql);
+            MySqlDataReader dataReader = sqlCmd.ExecuteReader();
+            bool result = dataReader.HasRows;
+            dataReader.Close();
+            return result;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("DbManager.CheckPassword : 检查密码失败 " + e.Message);
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// 获取玩家信息
+    /// </summary>
+    /// <param name="id">玩家id</param>
+    /// <returns></returns>
+    public static PlayerData GetPlayerData(string id)
+    {
+        //防止sql注入
+        if (!IsSafeString(id))
+        {
+            Console.WriteLine("DbManager.GetPlayerData : id {0} 不安全.数据库获取角色信息失败.", id);
+            return null;
+        }
+
+        //写入的sql语句
+        string s = string.Format("SELECT * FROM player WHERE id='{0}';", id);
+
+        try
+        {
+            MySqlCommand sqlCmd = new MySqlCommand(s, mySql);
+            MySqlDataReader dataReader = sqlCmd.ExecuteReader();
+            bool result = dataReader.HasRows;
+
+            //读取失败
+            if (!result)
+            {
+                Console.WriteLine("DbManager.GetPlayerData : 数据库读取失败,获取角色信息失败.", id);
+                dataReader.Close();
+                return null;
+            }
+
+            //读取数据
+            dataReader.Read();
+            string data = dataReader.GetString("data");
+
+            //反序列化
+            PlayerData playerData = JsonConvert.DeserializeObject<PlayerData>(data);
+
+            dataReader.Close();
+            return playerData;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("DbManager.GetPlayerData : 数据库获取玩家信息失败 " + e.Message);
+            return null;
+        }
+    }
+
+    public static bool UpdatePlayerData(string id, PlayerData playerData)
+    {
+        string data = JsonConvert.SerializeObject(playerData);
+
+        //写入的sql语句
+        string s = string.Format("UPDATE player SET data='{0}' WHERE id='{1}'", data, id);
+
+        try
+        {
+            MySqlCommand sqlCmd = new MySqlCommand(s, mySql);
+            //用于执行 SQL 命令的一个重要方法,增删改等
+            sqlCmd.ExecuteNonQuery();
+            return true;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("DbManager.UpdatePlayerData : 数据库更新玩家数据失败 " + e.Message);
             return false;
         }
     }
