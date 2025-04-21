@@ -20,4 +20,8 @@ public class ClientState
     /// 最后一次收到Ping的时间
     /// </summary>
     public long lastPingTime = 0;
+    /// <summary>
+    /// 玩家
+    /// </summary>
+    public Player player;
 }
