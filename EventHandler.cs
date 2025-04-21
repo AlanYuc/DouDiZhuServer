@@ -7,12 +7,15 @@ using System.Threading.Tasks;
 public class EventHandler
 {
     /// <summary>
-    /// 掉线处理
+    /// 掉线/下线处理
     /// </summary>
     /// <param name="clientState"></param>
     public static void OnDisconnect(ClientState clientState)
     {
-
+        //先更新玩家数据
+        DbManager.UpdatePlayerData(clientState.player.id, clientState.player.playerData);
+        //然后将玩家移除
+        PlayerManager.RemovePlayer(clientState.player.id);
     }
 
     /// <summary>
