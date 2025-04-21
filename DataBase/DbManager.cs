@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using MySqlConnector;
 using System.Text.RegularExpressions;
+using Newtonsoft.Json;
 #nullable disable
 
 public class DbManager
@@ -54,7 +55,7 @@ public class DbManager
     /// <summary>
     /// 判断账号是否存在
     /// </summary>
-    /// <param name="id"></param>
+    /// <param name="id">账号id</param>
     /// <returns></returns>
     public static bool IsAccountExist(string id)
     {
@@ -65,8 +66,9 @@ public class DbManager
         }
 
         //MySQL语句
-        //这里的写法要求id必须是数字，如果是字母比如tyc作为id，在下面解析时会把tyc当作列名
-        string s = string.Format("SELECT * FROM account WHERE id={0}",id);
+        //这里的写法要求id='{0}'这里必须加单引号
+        //不然无法解析除了数字以外包括字母在内的数据，比如tyc则会被解析为列名
+        string s = string.Format("SELECT * FROM account WHERE id='{0}'",id);
 
         try
         {
@@ -104,22 +106,57 @@ public class DbManager
         //防止id，pw不合法，直接影响MySQL
         if (!IsSafeString(id))
         {
-            Console.WriteLine("DbManager.Register : id不安全.注册失败.");
+            Console.WriteLine("DbManager.Register : id {0} 不安全.注册失败.", id);
             return false;
         }
         if (!IsSafeString(pw))
         {
-            Console.WriteLine("DbManager.Register : pw不安全.注册失败.");
+            Console.WriteLine("DbManager.Register : pw {0} 不安全.注册失败.", pw);
             return false;
         }
         if (IsAccountExist(id))
         {
-            Console.WriteLine("DbManager.Register : id已存在.注册失败.");
+            Console.WriteLine("DbManager.Register : id {0} 已存在.注册失败.", id);
             return false;
         }
 
         //注册的MySQL语句
-        string s = string.Format("INSERT INTO account SET id={0},pw={1};", id, pw);
+        string s = string.Format("INSERT INTO account SET id='{0}',pw='{1}';", id, pw);
+
+        try
+        {
+            MySqlCommand sqlCmd = new MySqlCommand(s, mySql);
+            //用于执行 SQL 命令的一个重要方法
+            sqlCmd.ExecuteNonQuery();
+            return true;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("DbManager.Register 注册失败 : " + e.Message);
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// 创建玩家
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    public static bool CreatPlayer(string id)
+    {
+        //防止sql注入
+        if (!IsSafeString(id))
+        {
+            Console.WriteLine("DbManager.CreatPlayer : id {0} 不安全.角色创建失败.", id);
+            return false;
+        }
+
+        //把玩家数据序列化
+        PlayerData playerData = new PlayerData();
+        string data = JsonConvert.SerializeObject(playerData);
+
+        //写入的sql语句
+        string s = string.Format("INSERT INTO player SET id='{0}',data='{1}';", id, data);
 
         try
         {
@@ -129,7 +166,7 @@ public class DbManager
         }
         catch (Exception e)
         {
-            Console.WriteLine("DbManager.Register 注册失败 : " + e.Message);
+            Console.WriteLine("DbManager.CreatPlayer 角色创建失败 : " + e.Message);
             return false;
         }
     }

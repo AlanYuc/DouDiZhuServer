@@ -22,6 +22,10 @@ namespace DouDiZhuServer
 
             //测试注册
             DbManager.Register("214", "123456");
+            DbManager.Register("tyc", "123456");
+
+            //测试创建玩家
+            //DbManager.CreatPlayer("1234");
 
             //测试连接
             NetManager.Connect("127.0.0.1", 8888);
