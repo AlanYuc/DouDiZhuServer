@@ -190,11 +190,6 @@ public class DbManager
             Console.WriteLine("DbManager.CheckPassword : pw {0} 不安全.检查密码失败.", pw);
             return false;
         }
-        if (IsAccountExist(id))
-        {
-            Console.WriteLine("DbManager.CheckPassword : id {0} 已存在.检查密码失败.", id);
-            return false;
-        }
 
         //写入的sql语句
         string s = string.Format("SELECT * FROM account WHERE id='{0}' AND pw='{1}';", id, pw);
