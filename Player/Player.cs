@@ -12,6 +12,14 @@ public class Player
     /// </summary>
     public string id = "";
     /// <summary>
+    /// 是否为房主
+    /// </summary>
+    public bool isHost = false;
+    /// <summary>
+    /// 该玩家所在的房间号，-1表示不再任何房间内
+    /// </summary>
+    public int roomId = -1;
+    /// <summary>
     /// 玩家所在的客户端
     /// </summary>
     public ClientState clientState;
