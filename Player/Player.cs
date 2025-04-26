@@ -20,6 +20,10 @@ public class Player
     /// </summary>
     public int roomId = -1;
     /// <summary>
+    /// 玩家是否准备
+    /// </summary>
+    public bool isPrepare = false;
+    /// <summary>
     /// 玩家所在的客户端
     /// </summary>
     public ClientState clientState;

@@ -12,10 +12,21 @@ public class EventHandler
     /// <param name="clientState"></param>
     public static void OnDisconnect(ClientState clientState)
     {
-        //先更新玩家数据
-        DbManager.UpdatePlayerData(clientState.player.id, clientState.player.playerData);
-        //然后将玩家移除
-        PlayerManager.RemovePlayer(clientState.player.id);
+        if(clientState.player != null)
+        {
+            //掉线的时候，也要把玩家从房间里面移除
+            int roomId = clientState.player.roomId;
+            if(roomId > -1)
+            {
+                Room room = RoomManager.GetRoom(roomId);
+                room.RemovePlayer(clientState.player.id);
+            }
+
+            //先更新玩家数据
+            DbManager.UpdatePlayerData(clientState.player.id, clientState.player.playerData);
+            //然后将玩家移除
+            PlayerManager.RemovePlayer(clientState.player.id);
+        }
     }
 
     /// <summary>

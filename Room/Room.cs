@@ -80,6 +80,12 @@ public class Room
             player.isHost = true;
         }
 
+        /*
+         * 玩家进入房间后，需要通知其他玩家，该玩家已进入房间
+         * 否则，该玩家的客户端虽然已经进入房间，但其他玩家的客户端却看不到该玩家在房间内
+         */
+        Broadcast(ToMsg());
+
         return true;
     }
 
@@ -130,6 +136,54 @@ public class Room
                 //RoomManager
             }
         }
+
+        /*
+         * 移除玩家后，需要通知其他玩家，该玩家已被移除出房间
+         * 否则，该玩家的客户端虽然已经离开房间，但其他玩家的客户端仍能看到该玩家在房间内
+         */
+        Broadcast(ToMsg());
+
         return true;
+    }
+
+    /// <summary>
+    /// 广播
+    /// </summary>
+    /// <param name="msgBase"></param>
+    public void Broadcast(MsgBase msgBase)
+    {
+        foreach(string id in playerList)
+        {
+            Player player = PlayerManager.GetPlayer(id);
+            player.Send(msgBase);
+        }
+    }
+
+    /// <summary>
+    /// 将房间内的所有玩家转成消息发送
+    /// </summary>
+    /// <returns></returns>
+    public MsgBase ToMsg()
+    {
+        MsgGetRoomInfo msgGetRoomInfo = new MsgGetRoomInfo();
+        //获取房间内玩家人数
+        int count = playerList.Count;
+        //创建PlayerInfo的玩家数组
+        msgGetRoomInfo.players = new PlayerInfo[count];
+
+        int i = 0;
+        foreach(string id in playerList)
+        {
+            PlayerInfo playerInfo = new PlayerInfo();
+            Player player = PlayerManager.GetPlayer(id);
+            playerInfo.playerID = id;
+            playerInfo.bean = player.playerData.bean;
+            playerInfo.isHost = player.isHost;
+            playerInfo.isPrepare = player.isPrepare;
+
+            msgGetRoomInfo.players[i++] = playerInfo;
+        }
+
+        return msgGetRoomInfo;
     }
 }
