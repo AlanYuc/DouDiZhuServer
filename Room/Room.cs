@@ -117,24 +117,27 @@ public class Room
         //判断是否需要更换房主
         if(player.isHost)
         {
+            //要移除的玩家是房主，那么先取消房主
             player.isHost = false;
 
             //遍历当前房间内剩余的玩家,找到一个，设置为房主即可
             foreach(string id in playerList)
             {
+                //修改房间的数据，设置房主id信息
                 hostId = id;
+                //修改玩家的数据，将玩家设置为房主
+                PlayerManager.GetPlayer(id).isHost = true;
                 break;
             }
+        }
 
-            //房间内没有人，hostId就置空
-            if (playerList.Count == 0)
-            {
-                hostId = "";
+        //房间内没有人，hostId就置空
+        if (playerList.Count == 0)
+        {
+            hostId = "";
 
-                //房间内没有人了，直接移除该房间
-                //TO DO
-                //RoomManager
-            }
+            //房间内没有人了，直接移除该房间
+            RoomManager.RemoveRoom(this.id);
         }
 
         /*
