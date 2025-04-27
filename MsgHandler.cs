@@ -291,5 +291,31 @@ public class MsgHandler
         msgLeaveRoom.result = true;
         player.Send(msgLeaveRoom);
     }
+
+    /// <summary>
+    /// 准备
+    /// </summary>
+    /// <param name="clientState"></param>
+    /// <param name="msgBase"></param>
+    public static void MsgPrepare(ClientState clientState, MsgBase msgBase)
+    {
+        MsgPrepare msgPrepare = msgBase as MsgPrepare;
+        Player player = clientState.player;
+        if (player == null)
+        {
+            return;
+        }
+
+        Room room = RoomManager.GetRoom(player.roomId);
+        if (room == null)
+        {
+            msgPrepare.isPrepare = false;
+            player.Send(msgPrepare);
+            return;
+        }
+
+        msgPrepare.isPrepare = room.Prepare(player.id);
+        player.Send(msgPrepare);
+    }
     #endregion
 }

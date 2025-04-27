@@ -19,6 +19,10 @@ public class Room
     /// </summary>
     public List<string> playerList = new List<string>();
     /// <summary>
+    /// 玩家准备状态（不包括房主）
+    /// </summary>
+    public Dictionary<string, bool> playerDict = new Dictionary<string, bool>();
+    /// <summary>
     /// 房主的id
     /// </summary>
     public string hostId = "";
@@ -146,6 +150,37 @@ public class Room
          */
         Broadcast(ToMsg());
 
+        return true;
+    }
+
+    /// <summary>
+    /// 根据玩家id返回其准备信息
+    /// </summary>
+    /// <param name="playerId"></param>
+    /// <returns></returns>
+    public bool Prepare(string playerId)
+    {
+        Player player = PlayerManager.GetPlayer(playerId);
+        if (player == null)
+        {
+            Console.WriteLine("Room.Prepare : 准备失败，玩家为空");
+            return false;
+        }
+
+        if (!playerList.Contains(playerId))
+        {
+            Console.WriteLine("Room.Prepare : 准备失败，该玩家不在房间内");
+            return false;
+        }
+
+        if (!playerDict.ContainsKey(playerId))
+        {
+            playerDict.Add(playerId, true);
+        }
+        else
+        {
+            playerDict[playerId] = true;
+        }
         return true;
     }
 
