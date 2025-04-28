@@ -118,6 +118,13 @@ public class Room
         playerList.Remove(playerId);
         player.roomId = -1;
 
+        //判断是否已准备
+        if (playerDict.ContainsKey(playerId))
+        {
+            playerDict.Remove(playerId);
+            player.isPrepare = false;
+        }
+
         //判断是否需要更换房主
         if(player.isHost)
         {
@@ -181,6 +188,9 @@ public class Room
         {
             playerDict[playerId] = true;
         }
+
+        player.isPrepare = true;
+        Broadcast(ToMsg());
         return true;
     }
 

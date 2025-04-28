@@ -317,5 +317,58 @@ public class MsgHandler
         msgPrepare.isPrepare = room.Prepare(player.id);
         player.Send(msgPrepare);
     }
+
+    /// <summary>
+    /// 开始游戏
+    /// </summary>
+    /// <param name="clientState"></param>
+    /// <param name="msgBase"></param>
+    public static void MsgStartGame(ClientState clientState, MsgBase msgBase)
+    {
+        MsgStartGame msgStartGame = msgBase as MsgStartGame;
+        Player player = clientState.player;
+        if (player == null)
+        {
+            return;
+        }
+
+        Room room = RoomManager.GetRoom(player.roomId);
+        if(room == null)
+        {
+            msgStartGame.result = 3;
+            player.Send(msgStartGame);
+            return;
+        }
+        
+        //人数不足，不能开始游戏
+        if(room.playerList.Count < room.maxPlayer)
+        {
+            msgStartGame.result = 1;
+            player.Send(msgStartGame);
+            return;
+        }
+
+        foreach(string id in room.playerList)
+        {
+            //房主不需要准备
+            if(id == room.hostId)
+            {
+                continue;
+            }
+
+            //有玩家未准备
+            if(!room.playerDict.ContainsKey(id) || !room.playerDict[id])
+            {
+                msgStartGame.result = 2;
+                player.Send(msgStartGame);
+                return;
+            }
+        }
+
+        msgStartGame.result = 0;
+        //成功开始游戏的消息需要广播给每一个房间内的玩家
+        room.Broadcast(msgStartGame);
+        return;
+    }
     #endregion
 }
