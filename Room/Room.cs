@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+#nullable disable
 
 public class Room
 {
@@ -47,6 +48,14 @@ public class Room
     /// 最后三张底牌用id为空的玩家单独保存
     /// </summary>
     public Dictionary<string , List<Card>> playerCards = new Dictionary<string , List<Card>>();
+    /// <summary>
+    /// 当前正在操作（叫地主等）的玩家id
+    /// </summary>
+    public string currentPlayer;
+    /// <summary>
+    /// 当前玩家在playerList中的索引
+    /// </summary>
+    public int currentPlayerIndex;
 
     public Room()
     {
@@ -217,6 +226,11 @@ public class Room
     /// </summary>
     public void Start()
     {
+        //随机从一个玩家开始
+        Random random = new Random();
+        currentPlayerIndex = random.Next(maxPlayer);
+        currentPlayer = playerList[currentPlayerIndex];
+
         //分配玩家手牌
         for(int i = 0; i < maxPlayer; i++)
         {

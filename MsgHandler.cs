@@ -403,5 +403,26 @@ public class MsgHandler
         player.Send(msgGetCardList);
         return;
     }
+
+    public static void MsgGetStartPlayer(ClientState clientState, MsgBase msgBase)
+    {
+        MsgGetStartPlayer msgGetStartPlayer = msgBase as MsgGetStartPlayer;
+        Player player = clientState.player;
+        if (player == null)
+        {
+            return;
+        }
+
+        Room room = RoomManager.GetRoom(player.roomId);
+        if (room == null)
+        {
+            player.Send(msgGetStartPlayer);
+            return;
+        }
+
+        msgGetStartPlayer.playerId = room.currentPlayer;
+        room.Broadcast(msgGetStartPlayer);
+        return;
+    }
     #endregion
 }
