@@ -27,7 +27,7 @@ public class Room
     /// </summary>
     public string hostId = "";
     /// <summary>
-    /// 状态，表示是否开始
+    /// 两种状态，表示整个房间是在准备中还是游戏中
     /// </summary>
     public enum Status
     {
@@ -35,9 +35,27 @@ public class Room
         Start,
     }
     /// <summary>
-    /// 状态
+    /// 状态，表示是否在游戏中
     /// </summary>
     public Status status = Status.Prepare;
+    /// <summary>
+    /// 当前房间使用的一副扑克牌
+    /// </summary>
+    public List<Card> cards;
+    /// <summary>
+    /// 玩家卡牌字典，储存所有玩家对应的卡牌。
+    /// 最后三张底牌用id为空的玩家单独保存
+    /// </summary>
+    public Dictionary<string , List<Card>> playerCards = new Dictionary<string , List<Card>>();
+
+    public Room()
+    {
+        if(cards == null)
+        {
+            CardManager.Shuffle();
+            cards = CardManager.cards;
+        }
+    }
 
     /// <summary>
     /// 根据id添加玩家
@@ -192,6 +210,33 @@ public class Room
         player.isPrepare = true;
         Broadcast(ToMsg());
         return true;
+    }
+
+    /// <summary>
+    /// 成功开始游戏后调用，处理游戏正式开始前的相关信息
+    /// </summary>
+    public void Start()
+    {
+        //分配玩家手牌
+        for(int i = 0; i < maxPlayer; i++)
+        {
+            List<Card> c = new List<Card>();
+            //根据最大手牌数，每人分配17张，剩余3张底牌
+            for (int j = i * CardManager.maxHandSize; j < (i + 1) * CardManager.maxHandSize; j++)
+            {
+                c.Add(cards[j]);
+            }
+            playerCards.Add(playerList[i], c);
+        }
+
+        //分配最后三张底牌
+        List<Card> lastThree = new List<Card>();
+        for(int i= maxPlayer * CardManager.maxHandSize - 3;i< maxPlayer * CardManager.maxHandSize; i++)
+        {
+            lastThree.Add(cards[i]);
+        }
+        //把最后三张底牌放进玩家卡牌字典，id用空字符串表示
+        playerCards.Add("", lastThree);
     }
 
     /// <summary>

@@ -19,9 +19,9 @@ public enum Suit
     /// </summary>
     Club,
     /// <summary>
-    /// 方片
+    /// 方片Diamond
     /// </summary>
-    Diamond,
+    Square,
     /// <summary>
     /// 红桃
     /// </summary>
@@ -29,7 +29,7 @@ public enum Suit
     /// <summary>
     /// 黑桃(Spade)
     /// </summary>
-    Square,
+    Spade,
 }
 
 /// <summary>
@@ -69,6 +69,18 @@ public class Card
     {
         this.suit = (Suit)suit;
         this.rank = (Rank)rank;
+    }
+
+    /// <summary>
+    /// Card转成CardInfo
+    /// </summary>
+    /// <returns></returns>
+    public CardInfo GetCardInfo()
+    {
+        CardInfo cardInfo = new CardInfo();
+        cardInfo.suit = (int)suit;
+        cardInfo.rank = (int)rank;
+        return cardInfo;
     }
 }
 

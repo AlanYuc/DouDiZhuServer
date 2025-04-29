@@ -10,12 +10,18 @@ public class CardManager
     /// 存放卡牌的集合
     /// </summary>
     public static List<Card> cards = new List<Card>();
+    /// <summary>
+    /// 玩家手牌的数量上限
+    /// </summary>
+    public static int maxHandSize = 17;
 
     /// <summary>
     /// 生成一副扑克牌
     /// </summary>
     public static void CreatePoker()
     {
+        cards.Clear();
+
         //四种花色
         for(int i = 1; i <= 4; i++)
         {
@@ -56,6 +62,21 @@ public class CardManager
         {
             cards.Add(cardQueue.Dequeue());
         }
+    }
+
+    /// <summary>
+    /// Card数组转成CardInfo数组
+    /// </summary>
+    /// <param name="cards"></param>
+    /// <returns></returns>
+    public static CardInfo[] GetCardInfos(Card[] cards)
+    {
+        CardInfo[] cardInfos = new CardInfo[cards.Length];
+        for (int i = 0; i < cardInfos.Length; i++)
+        {
+            cardInfos[i] = cards[i].GetCardInfo();
+        }
+        return cardInfos;
     }
 }
 

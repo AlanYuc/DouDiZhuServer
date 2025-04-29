@@ -365,9 +365,42 @@ public class MsgHandler
             }
         }
 
+        //成功开始游戏后，先将卡牌分配给玩家
+        room.Start();
+
         msgStartGame.result = 0;
         //成功开始游戏的消息需要广播给每一个房间内的玩家
         room.Broadcast(msgStartGame);
+        return;
+    }
+    #endregion
+
+    #region Game
+    /// <summary>
+    /// 获取卡牌
+    /// </summary>
+    /// <param name="clientState"></param>
+    /// <param name="msgBase"></param>
+    public static void MsgGetCardList(ClientState clientState, MsgBase msgBase)
+    {
+        MsgGetCardList msgGetCardList = msgBase as MsgGetCardList;
+        Player player = clientState.player;
+        if (player == null)
+        {
+            return;
+        }
+
+        Room room = RoomManager.GetRoom(player.roomId);
+        if (room == null)
+        {
+            player.Send(msgGetCardList);
+            return;
+        }
+
+        Card[] cards = room.playerCards[player.id].ToArray();
+        msgGetCardList.cardInfos = CardManager.GetCardInfos(cards);
+        
+        player.Send(msgGetCardList);
         return;
     }
     #endregion
