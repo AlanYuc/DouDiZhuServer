@@ -461,5 +461,57 @@ public class MsgHandler
         room.Broadcast(msgSwitchTurn);
         return;
     }
+
+    /// <summary>
+    /// 获得同桌的其他玩家
+    /// </summary>
+    /// <param name="clientState"></param>
+    /// <param name="msgBase"></param>
+    public static void MsgGetOtherPlayers(ClientState clientState, MsgBase msgBase)
+    {
+        MsgGetOtherPlayers msgGetOtherPlayers = msgBase as MsgGetOtherPlayers;
+        Player player = clientState.player;
+        if (player == null)
+        {
+            return;
+        }
+
+        Room room = RoomManager.GetRoom(player.roomId);
+        if (room == null)
+        {
+            return;
+        }
+
+        for(int i = 0; i < room.playerList.Count; i++)
+        {
+            if (room.playerList[i] == player.id)
+            {
+                //先赋值自己
+                msgGetOtherPlayers.playerId = room.playerList[i];
+
+                //找到坐在左边的玩家
+                if (i - 1 < 0)
+                {
+                    msgGetOtherPlayers.leftPlayerId = room.playerList[i - 1 + room.maxPlayer];
+                }
+                else
+                {
+                    msgGetOtherPlayers.leftPlayerId = room.playerList[i - 1];
+                }
+
+                //找到坐在右边的玩家
+                if (i + 1 >= room.maxPlayer)
+                {
+                    msgGetOtherPlayers.rightPlayerId = room.playerList[i + 1 - room.maxPlayer];
+                }
+                else
+                {
+                    msgGetOtherPlayers.rightPlayerId = room.playerList[i + 1];
+                }
+            }
+        }
+        player.Send(msgGetOtherPlayers);
+        return;
+    }
     #endregion
 }
