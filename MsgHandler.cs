@@ -404,6 +404,11 @@ public class MsgHandler
         return;
     }
 
+    /// <summary>
+    /// 从哪个玩家开始叫地主
+    /// </summary>
+    /// <param name="clientState"></param>
+    /// <param name="msgBase"></param>
     public static void MsgGetStartPlayer(ClientState clientState, MsgBase msgBase)
     {
         MsgGetStartPlayer msgGetStartPlayer = msgBase as MsgGetStartPlayer;
@@ -422,6 +427,38 @@ public class MsgHandler
 
         msgGetStartPlayer.playerId = room.currentPlayer;
         room.Broadcast(msgGetStartPlayer);
+        return;
+    }
+
+    /// <summary>
+    /// 更换回合
+    /// </summary>
+    /// <param name="clientState"></param>
+    /// <param name="msgBase"></param>
+    public static void MsgSwitchTurn(ClientState clientState, MsgBase msgBase)
+    {
+        MsgSwitchTurn msgSwitchTurn = msgBase as MsgSwitchTurn;
+        Player player = clientState.player;
+        if (player == null)
+        {
+            return;
+        }
+
+        Room room = RoomManager.GetRoom(player.roomId);
+        if (room == null)
+        {
+            return;
+        }
+
+        //更新为下一个玩家的索引
+        room.currentPlayerIndex++;
+        //防止下标越界
+        room.currentPlayerIndex %= room.maxPlayer;
+        //更新当前房间内进行操作的玩家id
+        room.currentPlayer = room.playerList[room.currentPlayerIndex];
+
+        msgSwitchTurn.nextPlayerId = room.currentPlayer;
+        room.Broadcast(msgSwitchTurn);
         return;
     }
     #endregion
