@@ -56,6 +56,14 @@ public class Room
     /// 当前玩家在playerList中的索引
     /// </summary>
     public int currentPlayerIndex;
+    /// <summary>
+    /// 玩家叫/抢地主的权值。-1表示未轮到该玩家操作，0表示不叫，1表示叫地主
+    /// </summary>
+    public Dictionary<string , int> landLordRank = new Dictionary<string , int>();
+    /// <summary>
+    /// 叫地主的玩家id，用于记录最后成为地主的玩家id
+    /// </summary>
+    public string callLandlordPlayerId;
 
     public Room()
     {
@@ -231,6 +239,12 @@ public class Room
         currentPlayerIndex = random.Next(maxPlayer);
         currentPlayer = playerList[currentPlayerIndex];
 
+        //初始化叫/抢地主的权值为-1
+        for(int i = 0; i < playerList.Count; i++)
+        {
+            landLordRank.Add(playerList[i], -1);
+        }
+
         //分配玩家手牌
         for(int i = 0; i < maxPlayer; i++)
         {
@@ -251,6 +265,51 @@ public class Room
         }
         //把最后三张底牌放进玩家卡牌字典，id用空字符串表示
         playerCards.Add("", lastThree);
+    }
+
+    /// <summary>
+    /// 判断一个玩家叫地主后，其他玩家是否需要抢地主
+    /// </summary>
+    /// <returns>如果不需要再抢地主，返回true，否则返回false</returns>
+    public bool CheckCall()
+    {
+        int count = 0;
+        foreach(int rank in landLordRank.Values)
+        {
+            //有玩家不叫地主
+            if(rank == 0)
+            {
+                count++;
+            }
+        }
+        //已经有两名玩家不叫地主，那么当剩下的玩家叫地主后，直接成功，其余玩家不需要抢地主
+        if(count == 2)
+        {
+            return true;
+        }
+        return false;
+    }
+
+    /// <summary>
+    /// 判断一个玩家不叫地主后，是否需要重新洗牌
+    /// </summary>
+    /// <returns>如果所有玩家都不叫，就重新洗牌，返回true，否则返回false</returns>
+    public bool CheckNotCall()
+    {
+        int count = 0;
+        foreach(int rank in landLordRank.Values)
+        {
+            if(rank == 0)
+            {
+                count++;
+            }
+        }
+        //如果三个玩家都不叫地主，那么重新洗牌
+        if(count == 3)
+        {
+            return true;
+        }
+        return false;
     }
 
     /// <summary>

@@ -513,5 +513,72 @@ public class MsgHandler
         player.Send(msgGetOtherPlayers);
         return;
     }
+
+    /// <summary>
+    /// 处理叫地主的逻辑
+    /// </summary>
+    /// <param name="clientState"></param>
+    /// <param name="msgBase"></param>
+    public static void MsgCallLandlord(ClientState clientState, MsgBase msgBase)
+    {
+        MsgCallLandlord msgCallLandlord = msgBase as MsgCallLandlord;
+        Player player = clientState.player;
+        if (player == null)
+        {
+            return;
+        }
+
+        Room room = RoomManager.GetRoom(player.roomId);
+        if (room == null)
+        {
+            return;
+        }
+
+        msgCallLandlord.id = player.id;
+
+        if (msgCallLandlord.isCall)
+        {
+            //叫地主
+
+            //更新叫地主的玩家id
+            room.callLandlordPlayerId = msgCallLandlord.id;
+            //更新叫地主权值
+            room.landLordRank[msgCallLandlord.id] = 1;
+
+            if (room.CheckCall())
+            {
+                //其他玩家不能再抢地主
+                msgCallLandlord.result = 3;
+            }
+            else
+            {
+                //其他玩家还能抢地主
+                msgCallLandlord.result = 1;
+            }
+            room.Broadcast(msgCallLandlord);
+            return;
+        }
+        else
+        {
+            //不叫地主
+            //不更新叫地主的玩家id
+            //room.callLandlordPlayerId = msgCallLandlord.id;
+            //更新叫地主权值
+            room.landLordRank[msgCallLandlord.id] = 0;
+
+            if (room.CheckNotCall())
+            {
+                //重新洗牌
+                msgCallLandlord.result = 2;
+            }
+            else
+            {
+                //其他玩家继续叫地主
+                msgCallLandlord.result = 0;
+            }
+            room.Broadcast(msgCallLandlord);
+            return;
+        }
+    }
     #endregion
 }
