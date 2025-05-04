@@ -580,5 +580,35 @@ public class MsgHandler
             return;
         }
     }
+
+    /// <summary>
+    /// 都没有叫地主的时候，重新开始并洗牌
+    /// </summary>
+    /// <param name="clientState"></param>
+    /// <param name="msgBase"></param>
+    public static void MsgReStart(ClientState clientState, MsgBase msgBase)
+    {
+        MsgReStart msgReStart = msgBase as MsgReStart;
+        Player player = clientState.player;
+        if (player == null)
+        {
+            return;
+        }
+
+        Room room = RoomManager.GetRoom(player.roomId);
+        if (room == null)
+        {
+            return;
+        }
+
+        //洗牌
+        CardManager.Shuffle();
+        //更新房间内的牌的信息
+        room.cards = CardManager.cards;
+        //重新分配给其他玩家
+        room.Start();
+        room.Broadcast(msgReStart);
+        return;
+    }
     #endregion
 }

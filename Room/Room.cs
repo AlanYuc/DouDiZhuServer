@@ -239,6 +239,10 @@ public class Room
         currentPlayerIndex = random.Next(maxPlayer);
         currentPlayer = playerList[currentPlayerIndex];
 
+        //每次开始包括重新洗牌的时候，都需要清空一次
+        playerCards.Clear();
+        landLordRank.Clear();
+
         //初始化叫/抢地主的权值为-1
         for(int i = 0; i < playerList.Count; i++)
         {
