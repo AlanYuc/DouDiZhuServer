@@ -610,5 +610,30 @@ public class MsgHandler
         room.Broadcast(msgReStart);
         return;
     }
+
+
+    /// <summary>
+    /// 开始抢地主
+    /// </summary>
+    /// <param name="clientState"></param>
+    /// <param name="msgBase"></param>
+    public static void MsgStartRobLandlord(ClientState clientState, MsgBase msgBase)
+    {
+        MsgStartRobLandlord msgStartRobLandlord = msgBase as MsgStartRobLandlord;
+        Player player = clientState.player;
+        if (player == null)
+        {
+            return;
+        }
+
+        Room room = RoomManager.GetRoom(player.roomId);
+        if (room == null)
+        {
+            return;
+        }
+
+        room.Broadcast(msgStartRobLandlord);
+        return;
+    }
     #endregion
 }
