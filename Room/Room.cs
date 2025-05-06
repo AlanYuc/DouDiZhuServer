@@ -57,11 +57,15 @@ public class Room
     /// </summary>
     public int currentPlayerIndex;
     /// <summary>
-    /// 玩家叫/抢地主的权值。-1表示未轮到该玩家操作，0表示不叫，1表示叫地主
+    /// 玩家叫/抢地主的权值。-1表示未轮到该玩家操作，0表示不叫，1表示叫地主,2以上表示抢地主
     /// </summary>
     public Dictionary<string , int> landLordRank = new Dictionary<string , int>();
     /// <summary>
-    /// 叫地主的玩家id，用于记录最后成为地主的玩家id
+    /// 抢地主的权值，每抢一次，该值需要加一
+    /// </summary>
+    public int robRank = 3;
+    /// <summary>
+    /// 记录最开始叫地主的玩家id，第二轮抢地主时需要用到
     /// </summary>
     public string callLandlordPlayerId;
 
@@ -248,6 +252,7 @@ public class Room
         {
             landLordRank.Add(playerList[i], -1);
         }
+        robRank = 3;
 
         //分配玩家手牌
         for(int i = 0; i < maxPlayer; i++)
@@ -314,6 +319,26 @@ public class Room
             return true;
         }
         return false;
+    }
+
+    /// <summary>
+    /// 判断哪个玩家成为地主
+    /// </summary>
+    /// <returns></returns>
+    public string CheckLandLord()
+    {
+        //元组
+        (string s, int i) result = ("", -1);
+
+        foreach(string id in landLordRank.Keys)
+        {
+            if (landLordRank[id] > result.i)
+            {
+                result = (id, landLordRank[id]);
+            }
+        }
+
+        return result.s;
     }
 
     /// <summary>

@@ -635,5 +635,56 @@ public class MsgHandler
         room.Broadcast(msgStartRobLandlord);
         return;
     }
+
+    /// <summary>
+    /// 抢地主
+    /// </summary>
+    /// <param name="clientState"></param>
+    /// <param name="msgBase"></param>
+    public static void MsgRobLandlord(ClientState clientState, MsgBase msgBase)
+    {
+        MsgRobLandlord msgRobLandlord = msgBase as MsgRobLandlord;
+        Player player = clientState.player;
+        if (player == null)
+        {
+            return;
+        }
+
+        Room room = RoomManager.GetRoom(player.roomId);
+        if (room == null)
+        {
+            return;
+        }
+
+        msgRobLandlord.id = player.id;
+
+        if (msgRobLandlord.isRob)
+        {
+            //玩家选择抢地主
+            room.landLordRank[player.id] += room.robRank;
+            room.robRank++;
+        }
+
+        if(msgRobLandlord.id == room.callLandlordPlayerId)
+        {
+            //当抢/不抢地主的玩家就是之前叫地主的玩家，说明一轮抢地主结束，开始判断谁是地主
+            msgRobLandlord.landLordId = room.CheckLandLord();
+        }
+
+        //获取下一个玩家id
+        int nextPlayerId = (room.currentPlayerIndex + 1) % room.maxPlayer;
+        //判断下一个玩家是否叫了地主
+        if (room.landLordRank[room.playerList[nextPlayerId]] == 0)
+        {
+            //landLordRank == 0 , 表示该玩家没叫地主，那该玩家就不能执行抢地主操作
+            msgRobLandlord.isNeedRob = false;
+        }
+        else
+        {
+            msgRobLandlord.isNeedRob = true;
+        }
+        room.Broadcast(msgRobLandlord);
+        return;
+    }
     #endregion
 }
