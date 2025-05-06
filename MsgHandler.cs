@@ -451,7 +451,8 @@ public class MsgHandler
         }
 
         //更新为下一个玩家的索引
-        room.currentPlayerIndex++;
+        //room.currentPlayerIndex++;
+        room.currentPlayerIndex += msgSwitchTurn.round;
         //防止下标越界
         room.currentPlayerIndex %= room.maxPlayer;
         //更新当前房间内进行操作的玩家id
