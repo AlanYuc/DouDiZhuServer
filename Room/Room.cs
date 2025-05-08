@@ -259,6 +259,7 @@ public class Room
         {
             List<Card> c = new List<Card>();
             //根据最大手牌数，每人分配17张，剩余3张底牌
+            //0-16,17-33,34-50
             for (int j = i * CardManager.maxHandSize; j < (i + 1) * CardManager.maxHandSize; j++)
             {
                 c.Add(cards[j]);
@@ -268,7 +269,8 @@ public class Room
 
         //分配最后三张底牌
         List<Card> lastThree = new List<Card>();
-        for(int i= maxPlayer * CardManager.maxHandSize - 3;i< maxPlayer * CardManager.maxHandSize; i++)
+        //51-53
+        for (int i = maxPlayer * CardManager.maxHandSize; i < maxPlayer * CardManager.maxHandSize + 3; i++)
         {
             lastThree.Add(cards[i]);
         }
