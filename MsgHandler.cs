@@ -397,8 +397,13 @@ public class MsgHandler
             return;
         }
 
+        //获取玩家手牌
         Card[] cards = room.playerCards[player.id].ToArray();
         msgGetCardList.cardInfos = CardManager.GetCardInfos(cards);
+
+        //获取三张底牌
+        Card[] threeCards = room.playerCards[""].ToArray();
+        msgGetCardList.threeCards = CardManager.GetCardInfos(threeCards);
         
         player.Send(msgGetCardList);
         return;
@@ -665,8 +670,17 @@ public class MsgHandler
             room.landLordRank[player.id] += room.robRank;
             room.robRank++;
         }
+        else
+        {
+            //玩家选择不抢地主
+            room.landLordRank[player.id] = 0;
+            if (room.CheckCall())
+            {
+                msgRobLandlord.landLordId = room.callLandlordPlayerId;
+            }
+        }
 
-        if(msgRobLandlord.id == room.callLandlordPlayerId)
+        if (msgRobLandlord.id == room.callLandlordPlayerId)
         {
             //当抢/不抢地主的玩家就是之前叫地主的玩家，说明一轮抢地主结束，开始判断谁是地主
             msgRobLandlord.landLordId = room.CheckLandLord();
