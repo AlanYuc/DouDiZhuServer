@@ -14,6 +14,68 @@ public class CardManager
     /// 玩家手牌的数量上限
     /// </summary>
     public static int maxHandSize = 17;
+    /// <summary>
+    /// 出牌的所有类型
+    /// </summary>
+    public enum CardType
+    {
+        /// <summary>
+        /// 单张
+        /// </summary>
+        SINGLE,
+        /// <summary>
+        /// 对子
+        /// </summary>
+        PAIR,
+        /// <summary>
+        /// 三张
+        /// </summary>
+        TRIPLE,
+        /// <summary>
+        /// 三带一
+        /// </summary>
+        TRIPLE_WITH_SINGLE,
+        /// <summary>
+        /// 三带二
+        /// </summary>
+        TRIPLE_WITH_PAIR,
+        /// <summary>
+        /// 顺子
+        /// </summary>
+        STRAIGHT,
+        /// <summary>
+        /// 连对
+        /// </summary>
+        STRAIGHT_PAIRS,
+        /// <summary>
+        /// 飞机
+        /// </summary>
+        AIRPLANE,
+        /// <summary>
+        /// 飞机带单张，333 444 5 6
+        /// </summary>
+        AIRPLANE_WITH_SINGLES,
+        /// <summary>
+        /// 飞机带对子，333 444 55 66
+        /// </summary>
+        AIRPLANE_WITH_PAIRS,
+        /// <summary>
+        /// 炸弹
+        /// </summary>
+        BOMB,
+        /// <summary>
+        /// 王炸
+        /// </summary>
+        JOKER_BOMB,
+        /// <summary>
+        /// 四代二
+        /// </summary>
+        FOUR_WITH_TWO,
+        /// <summary>
+        /// 无效出牌
+        /// </summary>
+        INVALID,
+    }
 
     /// <summary>
     /// 生成一副扑克牌
