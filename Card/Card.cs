@@ -48,7 +48,7 @@ public enum Rank
     Jack,
     Queen,
     King,
-    One,
+    Ace,
     Two,
     SJoker,
     LJoker,
