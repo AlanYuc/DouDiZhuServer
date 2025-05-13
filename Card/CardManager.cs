@@ -141,6 +141,26 @@ public class CardManager
         return cardInfos;
     }
 
+    /// <summary>
+    /// CardInfo数组转成Card数组
+    /// </summary>
+    /// <param name="cardInfos"></param>
+    /// <returns></returns>
+    public static Card[] GetCards(CardInfo[] cardInfos)
+    {
+        Card[] cards = new Card[cardInfos.Length];
+        for(int i = 0;i < cards.Length; i++)
+        {
+            cards[i] = new Card(cardInfos[i].suit, cardInfos[i].rank);
+        }
+        return cards;
+    }
+
+    /// <summary>
+    /// 获取出牌的类型
+    /// </summary>
+    /// <param name="cards"></param>
+    /// <returns></returns>
     public static CardType GetCardType(Card[] cards)
     {
         //出牌与花色无关，只关心具体大小
@@ -388,7 +408,7 @@ public class CardManager
             int airplaneLen = cardLen / 5;
             int index = 0;
             int[] arr = new int[airplaneLen];
-            for (int i = 0; i < airplaneLen - 2; i++) 
+            for (int i = 0; i < cardLen - 2; i++) 
             {
                 if (rank[i] == rank[i+1] && rank[i] == rank[i + 2])
                 {
@@ -451,7 +471,14 @@ public class CardManager
             Dictionary<int,int> dic = new Dictionary<int,int>();
             for(int i = 0; i < cardLen; i++)
             {
-                dic[rank[i]]++;
+                if (dic.ContainsKey(rank[i]))
+                {
+                    dic[rank[i]]++;
+                }
+                else
+                {
+                    dic.Add(rank[i], 1);
+                }
             }
 
             if(dic.Count!= 3)
