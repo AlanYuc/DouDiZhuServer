@@ -701,5 +701,25 @@ public class MsgHandler
         room.Broadcast(msgRobLandlord);
         return;
     }
+
+    public static void MsgPlayCards(ClientState clientState, MsgBase msgBase)
+    {
+        MsgPlayCards msgPlayCards = msgBase as MsgPlayCards;
+        Player player = clientState.player;
+        if (player == null)
+        {
+            return;
+        }
+
+        Room room = RoomManager.GetRoom(player.roomId);
+        if (room == null)
+        {
+            return;
+        }
+
+        Card[] cards = CardManager.GetCards(msgPlayCards.cardInfos);
+        msgPlayCards.cardType = (int)CardManager.GetCardType(cards);
+        player.Send(msgPlayCards);
+    }
     #endregion
 }
