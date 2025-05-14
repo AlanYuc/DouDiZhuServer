@@ -19,6 +19,10 @@ public class MsgPlayCards : MsgBase
     /// 出牌的类型
     /// </summary>
     public int cardType;
+    /// <summary>
+    /// 是否处理完成
+    /// </summary>
+    public bool result;
 
     public MsgPlayCards()
     {
