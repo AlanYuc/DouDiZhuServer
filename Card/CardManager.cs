@@ -510,5 +510,150 @@ public class CardManager
 
         return cardType;
     }
+
+    /// <summary>
+    /// 比较出牌的大小
+    /// </summary>
+    /// <param name="preCards">上一家出的牌</param>
+    /// <param name="curCards">自家准备出的牌</param>
+    /// <returns>比上一家出的牌更大，返回true，表示可以出</returns>
+    public static bool Compare(Card[] preCards , Card[] curCards)
+    {
+        /*
+         * Array.Sort的第二个参数可以用 IComparer接口 和 Lambda表达式 来自定义排序的方式
+         * CompareTo()方法比较两个int参数，结果为负数，说明 (int)card1.rank) 小于 (int)card2.rank
+         */
+        Array.Sort(preCards, (Card card1, Card card2) => ((int)card1.rank).CompareTo((int)card2.rank));
+        Array.Sort(curCards, (Card card1, Card card2) => ((int)card1.rank).CompareTo((int)card2.rank));
+
+        //王炸优先级最高
+        if(GetCardType(curCards) == CardType.JOKER_BOMB)
+        {
+            return true;
+        }
+        //上家没出炸弹，自家出了炸弹，则炸弹可以出
+        if(GetCardType(preCards) != CardType.BOMB && GetCardType(curCards) == CardType.BOMB)
+        {
+            return true;
+        }
+        //自家出牌与上家类型一致，开始比较大小
+        if(GetCardType(preCards) == GetCardType(curCards))
+        {
+            switch (GetCardType(curCards))
+            {
+                case CardType.SINGLE:
+                    if (preCards[0].rank < curCards[0].rank)
+                        return true;
+                    return false;
+                case CardType.PAIR:
+                    if (preCards[0].rank < curCards[0].rank)
+                        return true;
+                    return false;
+                case CardType.TRIPLE:
+                    if (preCards[0].rank < curCards[0].rank)
+                        return true;
+                    return false;
+                case CardType.TRIPLE_WITH_SINGLE:
+                    //三带一的话，因为之前排过序，因此下标为1的牌一定是三张中的牌，比较这个即可
+                    if (preCards[1].rank < curCards[1].rank)
+                        return true;
+                    return false;
+                case CardType.TRIPLE_WITH_PAIR:
+                    //理由同上，三带二比较下标为2的牌即可
+                    if (preCards[2].rank < curCards[2].rank)
+                        return true;
+                    return false;
+                case CardType.STRAIGHT:
+                    //顺子首先要保证出牌数量一致
+                    if (preCards.Length == curCards.Length)
+                        //只比较第一个即可
+                        if (preCards[0].rank < curCards[0].rank)
+                            return true;
+                    return false;
+                case CardType.STRAIGHT_PAIRS:
+                    //连对首先要保证出牌数量一致
+                    if (preCards.Length == curCards.Length)
+                        //只比较第一个即可
+                        if (preCards[0].rank < curCards[0].rank)
+                            return true;
+                    return false;
+                case CardType.AIRPLANE:
+                    //飞机首先要保证出牌数量一致
+                    if(preCards.Length == curCards.Length)
+                        if (preCards[0].rank < curCards[0].rank)
+                            return true;
+                    return false;
+                case CardType.AIRPLANE_WITH_SINGLES:
+                    //飞机首先要保证出牌数量一致
+                    if (preCards.Length == curCards.Length)
+                    {
+                        //找到飞机的第一个三张的牌进行比较
+                        int preIndex = -1;
+                        for(int i =0;i<preCards.Length - 2; i++)
+                        {
+                            if (preCards[i].rank == preCards[i+1].rank && preCards[i].rank == preCards[i+2].rank)
+                            {
+                                preIndex = i;
+                                break;
+                            }
+                        }
+                        int curIndex = -1;
+                        for (int i = 0; i < curCards.Length - 2; i++)
+                        {
+                            if (curCards[i].rank == curCards[i + 1].rank && curCards[i].rank == curCards[i + 2].rank)
+                            {
+                                curIndex = i;
+                                break;
+                            }
+                        }
+
+                        if (preCards[preIndex].rank < curCards[curIndex].rank)
+                            return true;
+                    }
+                    return false;
+                case CardType.AIRPLANE_WITH_PAIRS:
+                    //逻辑与飞机带单翅的一样
+                    if (preCards.Length == curCards.Length)
+                    {
+                        //找到飞机的第一个三张的牌进行比较
+                        int preIndex = -1;
+                        for (int i = 0; i < preCards.Length - 2; i++)
+                        {
+                            if (preCards[i].rank == preCards[i + 1].rank && preCards[i].rank == preCards[i + 2].rank)
+                            {
+                                preIndex = i;
+                                break;
+                            }
+                        }
+                        int curIndex = -1;
+                        for (int i = 0; i < curCards.Length - 2; i++)
+                        {
+                            if (curCards[i].rank == curCards[i + 1].rank && curCards[i].rank == curCards[i + 2].rank)
+                            {
+                                curIndex = i;
+                                break;
+                            }
+                        }
+
+                        if (preCards[preIndex].rank < curCards[curIndex].rank)
+                            return true;
+                    }
+                    return false;
+                case CardType.BOMB:
+                    if (preCards[0].rank < curCards[0].rank)
+                        return true;
+                    return false;
+                case CardType.JOKER_BOMB:
+                case CardType.FOUR_WITH_TWO:
+                    //理由同三带二，比较下标为2的牌即可
+                    if (preCards[2].rank < curCards[2].rank)
+                        return true;
+                    return false;
+                case CardType.INVALID:
+                    break;
+            }
+        }
+        return false;
+    }
 }
 
