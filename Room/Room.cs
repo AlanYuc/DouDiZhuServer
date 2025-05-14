@@ -49,6 +49,18 @@ public class Room
     /// </summary>
     public Dictionary<string , List<Card>> playerCards = new Dictionary<string , List<Card>>();
     /// <summary>
+    /// 记录上一次出的牌
+    /// </summary>
+    public List<Card> preCards = new List<Card>();
+    /// <summary>
+    /// 上上家是否出牌
+    /// </summary>
+    public bool isPrePrePlay;
+    /// <summary>
+    /// 上家是否出牌
+    /// </summary>
+    public bool isPrePlay;
+    /// <summary>
     /// 当前正在操作（叫地主等）的玩家id
     /// </summary>
     public string currentPlayer;
@@ -341,6 +353,27 @@ public class Room
         }
 
         return result.s;
+    }
+
+    /// <summary>
+    /// 将玩家手牌中的部分牌删除，一般用于出牌后
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="cards"></param>
+    public void DeleteCards(string id, Card[] cards)
+    {
+        for(int i = 0; i < cards.Length; i++)
+        {
+            for (int j = playerCards.Count - 1; j >= 0; j--) 
+            {
+                //不能直接写playerCards[id][j] == cards[i]，这两个都是引用类型，直接比较的引用
+                //或者直接重载==
+                if (playerCards[id][j].suit == cards[i].suit && playerCards[id][j].rank == cards[i].rank)
+                {
+                    playerCards[id].RemoveAt(j);
+                }
+            }
+        }
     }
 
     /// <summary>
