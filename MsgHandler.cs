@@ -717,9 +717,61 @@ public class MsgHandler
             return;
         }
 
+        msgPlayCards.id = player.id;
         Card[] cards = CardManager.GetCards(msgPlayCards.cardInfos);
-        msgPlayCards.cardType = (int)CardManager.GetCardType(cards);
-        player.Send(msgPlayCards);
+
+        //玩家出牌
+        if (msgPlayCards.isPlay)
+        {
+            msgPlayCards.cardType = (int)CardManager.GetCardType(cards);
+
+            //前两家有人出牌，那么自家出牌就需要比较大小
+            if(room.isPrePrePlay || room.isPrePlay)
+            {
+                msgPlayCards.result = CardManager.Compare(room.preCards.ToArray(), cards);
+            }
+            //前两家要不起，直接出牌就行
+            else
+            {
+                if(CardManager.GetCardType(cards) != CardManager.CardType.INVALID)
+                {
+                    msgPlayCards.result = true;
+                }
+                else
+                {
+                    msgPlayCards.result= false;
+                }
+            }
+
+            //出牌成功
+            if (msgPlayCards.result)
+            {
+                //把出的牌从手牌中删除
+                room.DeleteCards(player.id, cards);
+
+                //判断输赢（手牌是否出完了）
+
+                //更新出牌的相关信息。上上家、上家是否出牌，room.preCards
+                room.preCards = cards.ToList();
+                room.isPrePrePlay = room.isPrePlay;
+                room.isPrePlay = true;
+            }
+        }
+        //玩家不出牌
+        else
+        {
+            room.isPrePrePlay = room.isPrePlay;
+            room.isPrePlay = false;
+            if (!room.isPrePrePlay)
+            {
+                msgPlayCards.canNotPlay = false;
+            }
+            //不出牌 的行为一定是成功的
+            msgPlayCards.result = true;
+        }
+
+        room.Broadcast(msgPlayCards);
+        return;
     }
     #endregion
 }
