@@ -555,6 +555,13 @@ public class MsgHandler
             {
                 //其他玩家不能再抢地主
                 msgCallLandlord.result = 3;
+                room.landlordPlayerId = player.id;
+
+                //将三张底牌添加到地主的手牌中
+                foreach (Card card in room.playerCards[""])
+                {
+                    room.playerCards[room.landlordPlayerId].Add(card);
+                }
             }
             else
             {
@@ -684,6 +691,13 @@ public class MsgHandler
         {
             //当抢/不抢地主的玩家就是之前叫地主的玩家，说明一轮抢地主结束，开始判断谁是地主
             msgRobLandlord.landLordId = room.CheckLandLord();
+            room.landlordPlayerId = msgRobLandlord.landLordId;
+
+            //将三张底牌添加到地主的手牌中
+            foreach(Card card in room.playerCards[""])
+            {
+                room.playerCards[room.landlordPlayerId].Add(card);
+            }
         }
 
         //获取下一个玩家id
@@ -750,6 +764,7 @@ public class MsgHandler
                 room.DeleteCards(player.id, cards);
 
                 //判断输赢（手牌是否出完了）
+                msgPlayCards.win = room.CheckWin();
 
                 //更新出牌的相关信息。上上家、上家是否出牌，room.preCards
                 room.preCards = cards.ToList();

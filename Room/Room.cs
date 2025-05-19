@@ -77,9 +77,13 @@ public class Room
     /// </summary>
     public int robRank = 3;
     /// <summary>
-    /// 记录最开始叫地主的玩家id，第二轮抢地主时需要用到
+    /// 记录上一个叫地主的玩家id，第二轮抢地主时需要用到
     /// </summary>
     public string callLandlordPlayerId;
+    /// <summary>
+    /// 地主玩家id
+    /// </summary>
+    public string landlordPlayerId;
 
     public Room()
     {
@@ -374,6 +378,33 @@ public class Room
                 }
             }
         }
+    }
+
+    /// <summary>
+    /// 检测对局是否结束
+    /// </summary>
+    /// <returns>0没有结束 1农民胜利 2地主胜利</returns>
+    public int CheckWin()
+    {
+        foreach(string id in playerCards.Keys)
+        {
+            //碰到底牌直接跳过
+            if (id == "")
+                continue;
+
+            if (playerCards[id].Count == 0)
+            {
+                if (id == landlordPlayerId)
+                {
+                    return 2;
+                }
+                else
+                {
+                    return 1;
+                }
+            }
+        }
+        return 0;
     }
 
     /// <summary>
