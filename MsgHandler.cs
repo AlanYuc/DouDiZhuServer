@@ -684,6 +684,13 @@ public class MsgHandler
             if (room.CheckCall())
             {
                 msgRobLandlord.landLordId = room.callLandlordPlayerId;
+                room.landlordPlayerId = msgRobLandlord.landLordId;
+
+                //将三张底牌添加到地主的手牌中
+                foreach (Card card in room.playerCards[""])
+                {
+                    room.playerCards[room.landlordPlayerId].Add(card);
+                }
             }
         }
 
@@ -716,6 +723,11 @@ public class MsgHandler
         return;
     }
 
+    /// <summary>
+    /// 出牌的逻辑处理
+    /// </summary>
+    /// <param name="clientState"></param>
+    /// <param name="msgBase"></param>
     public static void MsgPlayCards(ClientState clientState, MsgBase msgBase)
     {
         MsgPlayCards msgPlayCards = msgBase as MsgPlayCards;
@@ -786,6 +798,60 @@ public class MsgHandler
         }
 
         room.Broadcast(msgPlayCards);
+        return;
+    }
+
+    public static void MsgGetBeansDelta(ClientState clientState, MsgBase msgBase)
+    {
+        MsgGetBeansDelta msgGetBeansDelta = msgBase as MsgGetBeansDelta;
+        Player player = clientState.player;
+        if (player == null)
+        {
+            return;
+        }
+
+        Room room = RoomManager.GetRoom(player.roomId);
+        if (room == null)
+        {
+            return;
+        }
+
+        int index = 0;
+        foreach(string id in room.playerList)
+        {
+            PlayerBeansInfo playerBeansInfo = new PlayerBeansInfo();
+            playerBeansInfo.playerId = id;
+            playerBeansInfo.multiplier = room.multiplier;
+
+            if(id == room.winId)
+            {
+                if(id== room.landlordPlayerId)
+                {
+                    //地主的倍数翻2倍
+                    playerBeansInfo.beansDelta = room.baseBean * playerBeansInfo.multiplier * 2;
+                }
+                else
+                {
+                    playerBeansInfo.beansDelta = room.baseBean * playerBeansInfo.multiplier;
+                }
+            }
+            else
+            {
+                if (id == room.landlordPlayerId)
+                {
+                    //地主的倍数翻2倍
+                    playerBeansInfo.beansDelta = room.baseBean * playerBeansInfo.multiplier * 2 * (-1);
+                }
+                else
+                {
+                    playerBeansInfo.beansDelta = room.baseBean * playerBeansInfo.multiplier * (-1);
+                }
+            }
+
+            msgGetBeansDelta.playerBeansInfos[index++] = playerBeansInfo;
+        }
+
+        room.Broadcast(msgGetBeansDelta);
         return;
     }
     #endregion
