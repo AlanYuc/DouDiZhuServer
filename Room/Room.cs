@@ -84,6 +84,19 @@ public class Room
     /// 地主玩家id
     /// </summary>
     public string landlordPlayerId;
+    /// <summary>
+    /// 获胜玩家的id
+    /// </summary>
+    public string winId;
+    /// <summary>
+    /// 对局的倍数
+    /// </summary>
+    public int multiplier = 1;
+    /// <summary>
+    /// 输赢的起始欢乐豆，默认150
+    /// </summary>
+    public int baseBean = 150;
+    
 
     public Room()
     {
@@ -366,15 +379,16 @@ public class Room
     /// <param name="cards"></param>
     public void DeleteCards(string id, Card[] cards)
     {
-        for(int i = 0; i < cards.Length; i++)
+        for (int i = 0; i < cards.Length; i++)
         {
-            for (int j = playerCards.Count - 1; j >= 0; j--) 
+            for (int j = playerCards[id].Count - 1; j >= 0; j--) 
             {
                 //不能直接写playerCards[id][j] == cards[i]，这两个都是引用类型，直接比较的引用
                 //或者直接重载==
                 if (playerCards[id][j].suit == cards[i].suit && playerCards[id][j].rank == cards[i].rank)
                 {
                     playerCards[id].RemoveAt(j);
+                    break;
                 }
             }
         }
@@ -394,6 +408,9 @@ public class Room
 
             if (playerCards[id].Count == 0)
             {
+                //更新获胜者id
+                winId = id;
+
                 if (id == landlordPlayerId)
                 {
                     return 2;
