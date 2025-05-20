@@ -823,28 +823,31 @@ public class MsgHandler
             playerBeansInfo.playerId = id;
             playerBeansInfo.multiplier = room.multiplier;
 
-            if(id == room.winId)
+            if(room.winId == room.landlordPlayerId)
             {
-                if(id== room.landlordPlayerId)
+                //地主获胜
+
+                if(id == room.landlordPlayerId)
                 {
                     //地主的倍数翻2倍
                     playerBeansInfo.beansDelta = room.baseBean * playerBeansInfo.multiplier * 2;
                 }
                 else
                 {
-                    playerBeansInfo.beansDelta = room.baseBean * playerBeansInfo.multiplier;
+                    playerBeansInfo.beansDelta = room.baseBean * playerBeansInfo.multiplier * (-1);
                 }
             }
             else
             {
-                if (id == room.landlordPlayerId)
+                //农民获胜
+
+                if(id == room.landlordPlayerId)
                 {
-                    //地主的倍数翻2倍
                     playerBeansInfo.beansDelta = room.baseBean * playerBeansInfo.multiplier * 2 * (-1);
                 }
                 else
                 {
-                    playerBeansInfo.beansDelta = room.baseBean * playerBeansInfo.multiplier * (-1);
+                    playerBeansInfo.beansDelta = room.baseBean * playerBeansInfo.multiplier;
                 }
             }
 
