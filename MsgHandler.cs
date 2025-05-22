@@ -857,5 +857,47 @@ public class MsgHandler
         room.Broadcast(msgGetBeansDelta);
         return;
     }
+
+    public static void MsgWaitForNextGame(ClientState clientState, MsgBase msgBase)
+    {
+        MsgWaitForNextGame msgWaitForNextGame = msgBase as MsgWaitForNextGame;
+        Player player = clientState.player;
+        if (player == null)
+        {
+            return;
+        }
+
+        Room room = RoomManager.GetRoom(player.roomId);
+        if (room == null)
+        {
+            return;
+        }
+
+        if (!room.waitingPlayers.ContainsKey(player.id))
+        {
+            room.waitingPlayers.Add(player.id, msgWaitForNextGame.isWait);
+        }
+
+        if (room.waitingPlayers.Count < 3)
+        {
+            msgWaitForNextGame.result = false;
+            room.Broadcast(msgWaitForNextGame);
+            return;
+        }
+
+        foreach(bool isWait in room.waitingPlayers.Values)
+        {
+            if (!isWait)
+            {
+                msgWaitForNextGame.result = false;
+                room.Broadcast(msgWaitForNextGame);
+                return;
+            }
+        }
+
+        msgWaitForNextGame.result = true;
+        room.Broadcast(msgWaitForNextGame);
+        return;
+    }
     #endregion
 }

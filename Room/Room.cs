@@ -96,6 +96,10 @@ public class Room
     /// 输赢的起始欢乐豆，默认150
     /// </summary>
     public int baseBean = 150;
+    /// <summary>
+    /// 点击"重新开始"后，正在等待的玩家
+    /// </summary>
+    public Dictionary<string , bool> waitingPlayers = new Dictionary<string , bool>();
     
 
     public Room()
@@ -275,6 +279,7 @@ public class Room
         //每次开始包括重新洗牌的时候，都需要清空一次
         playerCards.Clear();
         landLordRank.Clear();
+        waitingPlayers.Clear();
 
         //初始化叫/抢地主的权值为-1
         for(int i = 0; i < playerList.Count; i++)
