@@ -820,6 +820,8 @@ public class MsgHandler
             return;
         }
 
+        msgGetBeansDelta.id = player.id;
+
         int index = 0;
         foreach(string id in room.playerList)
         {
