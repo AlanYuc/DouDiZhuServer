@@ -365,6 +365,10 @@ public class MsgHandler
             }
         }
 
+        //洗牌
+        CardManager.Shuffle();
+        //更新房间内的牌的信息
+        room.cards = CardManager.cards;
         //成功开始游戏后，先将卡牌分配给玩家
         room.Start();
 
