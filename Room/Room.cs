@@ -280,6 +280,9 @@ public class Room
         playerCards.Clear();
         landLordRank.Clear();
         waitingPlayers.Clear();
+        preCards.Clear();
+        isPrePlay = false;
+        isPrePrePlay = false;
 
         //初始化叫/抢地主的权值为-1
         for(int i = 0; i < playerList.Count; i++)
